@@ -1,0 +1,90 @@
+James Wu
+CS32
+7/27/22
+
+========== Project 3 Report ==========
+
+For me personally, this project was difficult primarily due to the limit on Stack size, and wrapping my head around recursive permutations of words. I most struggled with debugging my program in order to fit the allotted 8MB of stack space. 
+
+Initially, I tried doing an approach where I'd alphabetize the word, alphabetize the dictionary word (without actually changing it of course), and then compare the two. If they were the same, the original dictionary word would then be added to the results array. This solved several issues-- repeat letters (e.g look), finding every permutation of a word, and so on. It also processed even the largest words very quickly. However, it involved a lot of nested recursive calls which resulted in stack overflow error after stack overflow error. After 6 whole hours of attempting to make this work, I restarted from scratch and decided to print permutations of the entire word, comparing each permutation to each word in the array.
+
+As a result of this approach, the stack overflow error was solved, at the cost of time for long words. Because every permutation of the word needed to be generated, this current method now results in longer processing time for words around 8-10 characters.
+
+It was also initially a challenge for me to understand how ifstream worked and how to read in entries from a text file, but after reading the provided documentation and experimenting for some time, I was able to overcome this obstacle as well. However, by far the greatest point of confusion for me was theJumbler function and how to overcome the issue of stack overflow when programming this project.
+
+
+
+========== Test Cases ==========
+
+I was able to finish the program and solve all issues that I was aware of, so theoretically, there should not be any test cases that fail. Here are the methods I used to test this project.
+
+I also used a while loop in my main function to continuously ask for user input, allowing me to constantly test multiple different words without having to restart the program over and over again.
+
+
+Tests for edge cases and to ensure that the results / dictionary would not exceed MAX constants:
+- Tested with an empty dictionary (numMatches == 0)
+- Tested with a bigger dictionary than MAXDICTWORDS (dictionary should stop being read in after MAXDICTWORDS entries)
+- Tested with a smaller dictionary than MAXDICTWORDS (array should no longer read in strings after dictionary stops)
+- Tested with a dictionary that didn't end with an empty line
+- Tested with a bigger MAXRESULTS constant than actual results generated
+- Tested with a smaller MAXRESULTS constant than actual results generated
+- Tested words with repeat letters, ensuring that repeat letter permutations would only be counted once
+
+
+Words tested to ensure the anagram portion of the program was working correctly: 
+super
+exit
+hi
+live
+wow
+look
+sparse
+anaconda
+awesome
+pass
+apple
+power
+cs
+many
+words
+try
+found
+like
+cry
+happy
+sad
+angry
+pencil
+pen
+water
+bottle
+sharpen
+ear
+bud
+earbud
+phone
+orange
+fruit
+vegetable
+so
+long
+ah
+aaa
+AAA
+Zoe
+zoE
+eZo
+oZe
+oeZ
+oez
+case
+alpha
+clambering
+
+
+...For each of these words, I would cerr the numMatches generated, print the results array, and generally try out some of the given results to see if the appropriate anagram would pop up showing the last word yet again. I'd also overall scrutinize whether or not the output seemed appropriate, as in whether or not it really was an anagram of the given word or whether there could be some other anagram generated that was not present (assuming it was also in the dictionary).
+
+
+
+
+

@@ -1,0 +1,287 @@
+James Wu
+605678163
+
+CS32 Project 2
+
+
+========== Description of Implementation ==========
+
+I chose to implement this project as a straightforward doubly linked list with no dummy nodes and no cycles. Each node itself contains several attributes: a value of type "GuestType", a string to hold the first name, a string to hold the last name, and two pointer nodes for the next node and previous node. In the overall list, the head's previous pointer is set to nullptr and the tail's next pointer is set to nullptr as well. An empty list is simply null. I found that this implementation was most intuitive in retrieving the data or performing functionality required of member functions, though for certain functions such as inviteGuest, the copy constructor, assignment operator, and some others, I used a temporary dummy node in order to accurately assign each node's "previous" node. However, at the end of these functions, the dummy node was deleted in order to account for and prevent memory leaks.
+
+
+========== Notable Obstacles ==========
+
+There were several obstacles I feel were significant to mention throughout the course of this project. Firstly, I had great difficulty implementing the two non-member functions in such a way that aliasing and repeat arguments were accounted for. For the joinGuests function, the reason for this was that I initially immediately assigned odJoined to equal odOne, and then went about appending odTwo to odJoined if the appropriate conditions were met. However, this worked for most cases, but if odJoined and odTwo were the same WeddingGuest this led to issues as the odTwo object itself would be altered and therefore not be appended correctly. I solved this issue by assigning odOne to a temporary WeddingGuest object and then reassigning odJoined to said object at the end of the function after all comparisons were made. I did the same method to resolve the aliasing issue in the "attestGuests" function, ensuring that for both of these non-member functions, the function calls could be made with any kinds of parameter repeats and still result in the final WeddingGuest object being correctly changed.
+
+Another challenge I encountered was memory leaks in my code. After completing what I believed to be a working implementation in XCode, I found that running my project on g32 resulted in memory leaks in 27 different areas, nearly all of which were located in my assignment operator and copy constructor code. After revisiting these functions, I found that since I was using a dummy node for my implementation of the "previous" Node pointers in each Node, I did not correctly delete the initial node and as such, this dynamically allocated Node was unaccounted for in my destructor resulting in a memory leak. I resolved this issue by creating a "dummyHead" pointer to point to the initial dummy node, and then deleting the extra dynamically allocated node at the conclusion of the function.
+
+
+========== Pseudocode for non-trivial algorithms ==========
+
+Copy Constructor:
+- If copy has at least one node, initialize head to have the same values as the first node.
+- Create a dummy node and set its next node to be the head. This can be used to assign previous values.
+- Iterate through the copy and assign each node to a node in the current linked list, iterating the dummy node each loop as well so that it'll point to the previous node of the current target.
+- Delete all dynamically allocated extra nodes, ensuring there are no memory leaks.
+
+
+Assignment Operator (similar to CC):
+- Clear all existing WeddingGuest objects in current linked list.
+- Initialize head to the first node of the copy, such that it has the same values.
+- Create a dummy node that has a next pointer pointing to head. This will be used to track previous nodes.
+- Iterate through the copy and assign each node to a node in current linked list, iterating dummy node so that it can be referenced for the previous node.
+- Delete all dynamically allocated extra nodes and return the current object.
+
+
+inviteGuest:
+- Check edge case of no existing items, in which case assign head to a new node that holds the given values.
+- Otherwise, values exist. Iterate through list to see if the given guest already exists, in which case return false.
+- Create a dummy node that has a next pointer pointing to head, to accurately track previous nodes.
+- Iterate through list until the object is alphabetically in order (using comparison operators to check).
+- Upon finding the appropriate place based on the last name (or first name, if the last name equals an existing last name), reassign existing nodes' next and previous pointers, and add the new node with appropriate values.
+- Account for edge case where inserted value is at the tail of the node.
+- Delete dynamically allocated dummy node and return true since item was successfully inserted.
+
+
+crossGuestOff:
+- Create a dummy node that has a next node pointing at head, used to track the previous node.
+- Iterate through list until target is found, iterating both iterator pointer and dummy pointer.
+- Once target found, account for edge cases (reassign head if item to be deleted is at front, and reassign the next node's previous node to point at the dummy only if it's valid (meaning not at the tail))
+- Delete target, dummy node, and return true if item is found.
+- Otherwise, if item is never found and entire list is traversed, delete dummy node and return false.
+
+
+verifyGuestOnTheList:
+- Iterate through entire list, determining the total length of the list.
+- Account for edge cases and if the index is valid by comparing given parameter "i" to the total length of the list. Return false if invalid.
+- Otherwise, iterate until iterator pointer points directly on the target node specified by the index.
+- Reassign given parameters to equal those of the target node at index i, then return true.
+
+
+joinGuests:
+- Assign parameter "odOne" to a temporary WeddingGuest object "returnGuest". This accounts for the edge case of if odOne or odTwo is the same WeddingGuest object as odJoined.
+- Iterate through odTwo and append all items of odTwo to returnGuest if it is valid-- meaning, if the name doesn't exist OR the name exists and the values are identical.
+- If the name exists in both lists but the values are different, cross the name off the guest, don't invite them, and store the return value to be false.
+- Assign odJoined to the now correctly assigned returnGuest object.
+- Return whatever value of the return variable was stored-- whether true or false (if an invalid name was detected).
+
+
+attestGuests:
+- Assign parameter "odOne" to a temporary WeddingGuest object "search", to account for edge case of aliasing.
+- Set odResult equal to a newly created (and therefore, guest-less) WeddingGuest object. This ensures odResult starts with no elements.
+- Iterate through search.
+- Invite the guest at the current index to odResult if they fit the appropriate condition-- being the first and last name are as specified, or the last name is as specified and first name is wild card, vice versa, or if both first and last names are wild cards.
+
+
+
+========== Test cases ==========
+/* The following test cases can be used to effectively test every function in the program. I had time to implement all functions, so (hopefully) they all work as expected. */
+
+/* There are some uses of the "dump()" function that have been commented out, and uncommenting them one by one may enable you to see the list as printed and observe whether it is as expected. */
+
+
+//Test cases
+#include <iostream>
+#include <cassert>
+#include "WeddingGuest.h"
+using namespace std;
+
+int main(){
+    
+    //Sample from spec
+    // default constructor
+    WeddingGuest lal;
+    // For an empty list:
+    assert(lal.guestCount() == 0); // test size
+    assert(lal.noGuests()); // test empty
+    assert(!lal.crossGuestOff("Malik", "Monk")); // nothing to erase
+
+    //Test constructor
+    WeddingGuest james;
+    assert(james.noGuests());
+    assert(james.guestCount() == 0);
+
+    //Test functions (GuestType is a string)
+    //inviteGuest, noGuests, guestCount, verifyGuestOnList, alterGuest
+    string first;
+    string last;
+    GuestType val;
+    james.inviteGuest("James", "Wu", "19");
+    james.inviteGuest("Phillip", "Ma", "18");
+    james.inviteGuest("Kat", "Wang", "19");
+    james.inviteGuest("Nathan", "Zhang", "19");
+    assert(james.noGuests() == false);
+    assert(james.guestCount() == 4);
+    bool test = james.verifyGuestOnTheList(0, first, last, val);
+    assert(first == "Phillip" && last == "Ma" && val == "18" && test);
+    test = james.alterGuest("Phillip", "Ma", "20");    // Phillip val should now equal 20
+    james.verifyGuestOnTheList(0, first, last, val);
+    assert(val == "20" && test);
+    test = james.alterGuest("Scrooge", "McDuck", "100");
+    assert(!test);
+    test = james.alterGuest("Phillip", "Ma", "20"); //Even though this value already exists, test should still be true
+    assert(test);
+
+    //inviteOrAlter, crossGuestOff, invitedToTheWedding
+    test = james.inviteOrAlter("James", "Wu", "20");    //Name equal to name on list
+    james.verifyGuestOnTheList(2, first, last, val);
+    assert(test && first == "James" && last == "Wu" && val == "20");
+    test = james.inviteOrAlter("Scooby", "Doo", "5");   //Name not on list, invite
+    james.verifyGuestOnTheList(0, first, last, val);
+    assert(test && first == "Scooby" && last == "Doo" && val == "5" && james.guestCount() == 5 && james.noGuests() == false);
+    james.crossGuestOff("Scooby", "Doo");
+    james.crossGuestOff("Kat", "Wang");
+    assert(james.guestCount() == 3 && !james.noGuests());
+    assert(james.invitedToTheWedding("Phillip", "Ma") && james.invitedToTheWedding("James", "Wu") && james.invitedToTheWedding("Nathan", "Zhang") && !james.invitedToTheWedding("james", "Wu") && !james.invitedToTheWedding("Scooby", "Doo") && !james.invitedToTheWedding("JAMES", "wu"));
+
+    //List is now: Phillip, James, Nathan
+
+    //matchInvitedGuest, verifyGuestOnTheList
+    test = james.matchInvitedGuest("Nathan", "Zhang", val);
+    assert(test && val == "19");
+    test = james.matchInvitedGuest("Master", "Oogway", val);
+    assert(!test && val == "19");
+    test = james.verifyGuestOnTheList(-1, first, last, val);
+    assert(!test);
+    test = james.verifyGuestOnTheList(1, first, last, val);
+    assert(test && first == "James" && last == "Wu" && val == "20");
+    test = james.verifyGuestOnTheList(james.guestCount(), first, last, val);
+    assert(!test);
+
+    //Copy Constructor, assignment operator, swapWeddingGuests
+    WeddingGuest michael(james);    //Copy constructor called
+    string first2;
+    string last2;
+    GuestType val2;
+    //Guest counts should be equivalent for michael and james
+    for(int i = 0; i < michael.guestCount(); i++){
+        michael.verifyGuestOnTheList(i, first2, last2, val2);
+        james.verifyGuestOnTheList(i, first, last, val);
+        assert(first == first2 && last == last2 && val == val2 && james.guestCount() == michael.guestCount() && james.noGuests() == michael.noGuests());
+    }
+    WeddingGuest wendy;
+    wendy.inviteGuest("Harry", "Potter", "18");
+    wendy.inviteGuest("Albus", "Dumbledore", "100");
+    wendy.inviteGuest("Ron", "Weasley", "5");
+    michael = wendy;    //Assignment operator called
+    //Repeat process to test for equality
+    for(int i = 0; i < michael.guestCount(); i++){
+        michael.verifyGuestOnTheList(i, first2, last2, val2);
+        wendy.verifyGuestOnTheList(i, first, last, val);
+        assert(first == first2 && last == last2 && val == val2 && james.guestCount() == michael.guestCount() && james.noGuests() == michael.noGuests());
+    }
+    james.inviteGuest("Kat", "Wang", "20"); //Just to test for different lengths
+    james.swapWeddingGuests(michael);   //Items should now be swapped
+    assert(james.noGuests() == false && james.guestCount() == 3);
+    assert(michael.noGuests() == false && michael.guestCount() == 4);
+    for(int i = 0; i < james.guestCount(); i++){
+        james.verifyGuestOnTheList(i, first, last, val);
+        wendy.verifyGuestOnTheList(i, first2, last2, val2);
+        assert(first == first2 && last == last2 && val == val2 && james.guestCount() == wendy.guestCount());
+    }
+    assert(michael.invitedToTheWedding("James", "Wu") && michael.invitedToTheWedding("Nathan", "Zhang") && michael.invitedToTheWedding("Phillip", "Ma") && michael.invitedToTheWedding("Kat", "Wang") && !michael.invitedToTheWedding("james", "wu"));
+    james.swapWeddingGuests(james); //Aliasing-- james should be unchanged.
+    for(int i = 0; i < james.guestCount(); i++){
+        james.verifyGuestOnTheList(i, first, last, val);
+        wendy.verifyGuestOnTheList(i, first2, last2, val2);
+        assert(first == first2 && last == last2 && val == val2 && james.guestCount() == wendy.guestCount());
+    }
+
+    //joinGuests, attestGuests
+    WeddingGuest jla;
+    WeddingGuest avengers;
+    jla.inviteGuest("Bruce", "Wayne", "20");
+    jla.inviteGuest("Clark", "Kent", "30");
+    jla.inviteGuest("Barry", "Allen", "20");
+    avengers.inviteGuest("Tony", "Stark", "30");
+    avengers.inviteGuest("Steve", "Rogers", "100");
+    avengers.inviteGuest("Bruce", "Wayne", "20");
+    WeddingGuest result;
+
+    test = joinGuests(jla, avengers, result);
+    assert(test);
+    result.verifyGuestOnTheList(0, first, last, val);
+    assert(first == "Barry" && last == "Allen" && val == "20");
+    result.verifyGuestOnTheList(1, first, last, val);
+    assert(first == "Clark" && last == "Kent" && val == "30");
+    result.verifyGuestOnTheList(2, first, last, val);
+    assert(first == "Steve" && last == "Rogers" && val == "100");
+    result.verifyGuestOnTheList(3, first, last, val);
+    assert(first == "Tony" && last == "Stark" && val == "30");
+    result.verifyGuestOnTheList(4, first, last, val);
+    assert(first == "Bruce" && last == "Wayne" && val == "20");
+    assert(result.guestCount() == 5);
+    avengers.alterGuest("Bruce", "Wayne", "10");
+    test = joinGuests(jla, avengers, result);
+    assert(!test && result.guestCount() == 4 && !result.invitedToTheWedding("Bruce", "Wayne"));
+    test = joinGuests(jla, jla, result);
+    assert(test);
+    avengers.alterGuest("Bruce", "Wayne", "20");
+    test = joinGuests(jla, avengers, jla);
+//    jla.dump();
+    assert(test);
+    jla.verifyGuestOnTheList(0, first, last, val);
+    assert(first == "Barry" && last == "Allen" && val == "20");
+    jla.verifyGuestOnTheList(1, first, last, val);
+    assert(first == "Clark" && last == "Kent" && val == "30");
+    jla.verifyGuestOnTheList(2, first, last, val);
+    assert(first == "Steve" && last == "Rogers" && val == "100");
+    jla.verifyGuestOnTheList(3, first, last, val);
+    assert(first == "Tony" && last == "Stark" && val == "30");
+    jla.verifyGuestOnTheList(4, first, last, val);
+    assert(first == "Bruce" && last == "Wayne" && val == "20");
+    assert(jla.guestCount() == 5);
+
+    test = joinGuests(avengers, avengers, avengers);
+    assert(test);
+//    avengers.dump();
+    test = joinGuests(jla, avengers, avengers);
+    assert(test);
+//    avengers.dump();
+
+    WeddingGuest sv;
+    sv.inviteGuest("Gavin", "Belson", "50");
+    sv.inviteGuest("Richard", "Hendricks", "26");
+    sv.inviteGuest("Jared", "Dunn", "24");
+    sv.inviteGuest("Nelson", "Belson", "20");
+    sv.inviteGuest("Jared", "Wack", "24");
+    sv.inviteGuest("Rick", "Hendricks", "18");
+    sv.inviteGuest("Steve", "Jobs", "40");
+
+    attestGuests("Steve", "Jobs", sv, result);
+//    result.dump();
+    attestGuests("Richard", "Hendricks", sv, result);
+//    result.dump();
+    attestGuests("*", "Belson", sv, result);
+    assert(result.guestCount() == 2 && !result.noGuests());
+//    result.dump();
+    attestGuests("Jared", "*", sv, result);
+    assert(result.guestCount() == 2 && !result.noGuests());
+//    result.dump();
+    attestGuests("*", "*", sv, result);
+    assert(result.guestCount() == 7 && !result.noGuests());
+//    result.dump();
+    attestGuests("*", "belson", sv, result);
+    assert(result.guestCount() == 0 && result.noGuests());
+    attestGuests("*", "Belson", sv, sv);    //This should alter sv.
+    assert(sv.guestCount() == 2 && !sv.noGuests());
+//    sv.dump();
+    attestGuests("James", "Wu", sv, sv);   //sv should be empty after this
+    assert(sv.guestCount() == 0 && sv.noGuests());
+//    sv.dump();
+
+    cerr << "All tests passed\n";
+
+}
+
+
+
+
+
+
+
+
+
+
+
+

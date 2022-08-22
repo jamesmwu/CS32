@@ -1,0 +1,61 @@
+{
+  "_buildCommand2" : {
+    "command" : "prepareForIndexing",
+    "enableIndexBuildArena" : true,
+    "targets" : null
+  },
+  "buildCommand" : "build",
+  "configuredTargets" : [
+    {
+      "guid" : "7a1e0fbd8cf63c14bb3ec42690811b13201c1b4f8fc48bdce0adaec58527603f"
+    }
+  ],
+  "containerPath" : "/Users/jameswu/Desktop/CS32/HW2/HW2.xcodeproj",
+  "continueBuildingAfterErrors" : true,
+  "enableIndexBuildArena" : false,
+  "hideShellScriptEnvironment" : false,
+  "parameters" : {
+    "action" : "indexbuild",
+    "activeArchitecture" : "arm64e",
+    "activeRunDestination" : {
+      "disableOnlyActiveArch" : false,
+      "platform" : "macosx",
+      "sdk" : "macosx12.3",
+      "sdkVariant" : "macos",
+      "supportedArchitectures" : [
+        "arm64e",
+        "arm64",
+        "x86_64"
+      ],
+      "targetArchitecture" : "arm64e"
+    },
+    "arenaInfo" : {
+      "buildIntermediatesPath" : "/Users/jameswu/Desktop/CS32/HW2/DerivedData/HW2/Index/Build/Intermediates.noindex",
+      "buildProductsPath" : "/Users/jameswu/Desktop/CS32/HW2/DerivedData/HW2/Index/Build/Products",
+      "derivedDataPath" : "/Users/jameswu/Desktop/CS32/HW2/DerivedData",
+      "indexDataStoreFolderPath" : "/Users/jameswu/Desktop/CS32/HW2/DerivedData/HW2/Index/DataStore",
+      "indexEnableDataStore" : true,
+      "indexPCHPath" : "/Users/jameswu/Desktop/CS32/HW2/DerivedData/HW2/Index/PrecompiledHeaders",
+      "pchPath" : "/Users/jameswu/Desktop/CS32/HW2/DerivedData/HW2/Index/Build/Intermediates.noindex/PrecompiledHeaders"
+    },
+    "configurationName" : "Debug",
+    "overrides" : {
+      "synthesized" : {
+        "table" : {
+          "ENABLE_PREVIEWS" : "NO",
+          "INDEX_ARENA_INFO_REGULAR_BUILD_PRODUCTS_DIR" : "/Users/jameswu/Desktop/CS32/HW2/DerivedData/HW2/Build/Products",
+          "ONLY_ACTIVE_ARCH" : "YES"
+        }
+      }
+    }
+  },
+  "qos" : "utility",
+  "schemeCommand" : "launch",
+  "schemeCommand2" : "launch",
+  "shouldCollectMetrics" : false,
+  "showNonLoggedProgress" : true,
+  "useDryRun" : false,
+  "useImplicitDependencies" : true,
+  "useLegacyBuildLocations" : false,
+  "useParallelTargets" : true
+}
